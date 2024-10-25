@@ -1,13 +1,11 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-// @ts-expect-error process is a nodejs global
 const host = process.env.TAURI_DEV_HOST;
 
 // https://vitejs.dev/config/
-export default defineConfig(async () => ({
+export default defineConfig({
   plugins: [react()],
-
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //
   // 1. prevent vite from obscuring rust errors
@@ -29,4 +27,10 @@ export default defineConfig(async () => ({
       ignored: ["**/src-tauri/**"],
     },
   },
-}));
+  build: {
+    // 在 debug 构建中不使用 minify
+    minify: !process.env.TAURI_ENV_DEBUG ? 'esbuild' : false,
+    // 在 debug 构建中生成 sourcemap
+    sourcemap: !!process.env.TAURI_ENV_DEBUG,
+  },
+});
